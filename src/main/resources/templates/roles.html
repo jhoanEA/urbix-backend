@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments :: pagina('Roles', ~{::cuerpo})}">
+<body>
+<div th:fragment="cuerpo">
+    <h3>Roles de usuario</h3>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <form method="post" action="/roles/guardar" class="row g-2 mb-4">
+        <div class="col-md-8"><input name="nombre" class="form-control" placeholder="Nombre del rol" required></div>
+        <div class="col-md-4"><button class="btn btn-primary w-100">Agregar</button></div>
+    </form>
+    <table class="table table-striped bg-white">
+        <thead><tr><th>Nombre</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="r : ${lista}">
+            <td th:text="${r.nombreRol}"></td>
+            <td class="text-end"><a th:href="@{/roles/eliminar/{id}(id=${r.idRol})}" class="btn btn-sm btn-danger">Eliminar</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

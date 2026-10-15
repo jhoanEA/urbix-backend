@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments :: pagina('Zonas', ~{::cuerpo})}">
+<body>
+<div th:fragment="cuerpo">
+    <h3>Zonas de trabajo</h3>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <form method="post" action="/zonas/guardar" class="row g-2 mb-4">
+        <div class="col-md-4"><input name="distrito" class="form-control" placeholder="Distrito"></div>
+        <div class="col-md-4"><input name="sector" class="form-control" placeholder="Sector (ej. Sector 1 - Cercado)" required></div>
+        <div class="col-md-4"><button class="btn btn-primary w-100">Agregar</button></div>
+    </form>
+    <table class="table table-striped bg-white">
+        <thead><tr><th>Distrito</th><th>Sector</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="z : ${lista}">
+            <td th:text="${z.distrito}"></td>
+            <td th:text="${z.nombreSector}"></td>
+            <td class="text-end"><a th:href="@{/zonas/eliminar/{id}(id=${z.idZona})}" class="btn btn-sm btn-danger">Eliminar</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

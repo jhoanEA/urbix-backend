@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments :: pagina('Usuarios', ~{::cuerpo})}">
+<body>
+<div th:fragment="cuerpo">
+    <h3>Usuarios</h3>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <form method="post" action="/usuarios/guardar" class="row g-2 mb-4">
+        <div class="col-md-3"><input name="nombre" class="form-control" placeholder="Nombre" required></div>
+        <div class="col-md-3"><input type="email" name="correo" class="form-control" placeholder="Correo" required></div>
+        <div class="col-md-2"><input type="password" name="password" class="form-control" placeholder="Clave" required></div>
+        <div class="col-md-2">
+            <select name="idRol" class="form-select">
+                <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}"></option>
+            </select>
+        </div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Agregar</button></div>
+    </form>
+    <table class="table table-striped bg-white">
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="u : ${lista}">
+            <td th:text="${u.nombre}"></td>
+            <td th:text="${u.correo}"></td>
+            <td th:text="${u.rol.nombreRol}"></td>
+            <td th:text="${u.activo} ? 'Activo' : 'Inactivo'"></td>
+            <td>
+                <a th:if="${u.activo}" th:href="@{/usuarios/desactivar/{id}(id=${u.idUsuario})}" class="btn btn-sm btn-warning">Desactivar</a>
+                <a th:unless="${u.activo}" th:href="@{/usuarios/activar/{id}(id=${u.idUsuario})}" class="btn btn-sm btn-success">Activar</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

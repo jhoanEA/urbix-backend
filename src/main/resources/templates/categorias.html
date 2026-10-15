@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments :: pagina('Categorías', ~{::cuerpo})}">
+<body>
+<div th:fragment="cuerpo">
+    <h3>Categorías de avería</h3>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <form method="post" action="/categorias/guardar" class="row g-2 mb-4">
+        <div class="col-md-8"><input name="nombre" class="form-control" placeholder="Nombre de la categoría" required></div>
+        <div class="col-md-4"><button class="btn btn-primary w-100">Agregar</button></div>
+    </form>
+    <table class="table table-striped bg-white">
+        <thead><tr><th>Nombre</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${lista}">
+            <td th:text="${c.nombreCategoria}"></td>
+            <td class="text-end"><a th:href="@{/categorias/eliminar/{id}(id=${c.idCategoria})}" class="btn btn-sm btn-danger">Eliminar</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

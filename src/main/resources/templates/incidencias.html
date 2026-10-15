@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments :: pagina('Incidencias', ~{::cuerpo})}">
+<body>
+<div th:fragment="cuerpo">
+    <h3>Incidencias sincronizadas</h3>
+    <table class="table table-striped bg-white">
+        <thead><tr><th>Código</th><th>Categoría</th><th>Zona</th><th>Descripción</th><th>Estado</th><th>Cuadrilla</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="i : ${lista}">
+            <td th:text="${i.clientUuid}"></td>
+            <td th:text="${i.categoria != null ? i.categoria.nombreCategoria : ''}"></td>
+            <td th:text="${i.zona != null ? i.zona.nombreSector : ''}"></td>
+            <td th:text="${i.descripcion}"></td>
+            <td th:text="${i.estado}"></td>
+            <td th:text="${i.cuadrillaAsignada}"></td>
+            <td>
+                <form method="post" th:action="@{/incidencias/{id}/estado(id=${i.idIncidencia})}" class="d-flex gap-1">
+                    <select name="estado" class="form-select form-select-sm">
+                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == i.estado}"></option>
+                    </select>
+                    <input name="cuadrilla" class="form-control form-control-sm" placeholder="Cuadrilla" th:value="${i.cuadrillaAsignada}">
+                    <button class="btn btn-sm btn-primary">OK</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
