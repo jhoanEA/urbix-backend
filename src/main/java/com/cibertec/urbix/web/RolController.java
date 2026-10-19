@@ -1,9 +1,7 @@
 package com.cibertec.urbix.web;
 
-import com.cibertec.urbix.model.Rol;
-import com.cibertec.urbix.repository.RolRepository;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.dao.DataIntegrityViolationException;
+import com.cibertec.urbix.exception.DatosInvalidosException;
+import com.cibertec.urbix.service.RolService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,51 +14,43 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/roles")
 public class RolController {
 
-    private final RolRepository roles;
+    private final RolService roles;
 
-    public RolController(RolRepository roles) {
+    public RolController(RolService roles) {
         this.roles = roles;
     }
 
-    private boolean sesion(HttpSession sesion) {
-        return sesion.getAttribute("usuario") != null;
-    }
-
     @GetMapping
-    public String listar(HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
-        modelo.addAttribute("lista", roles.findAll());
+    public String listar(Model modelo) {
+        modelo.addAttribute("lista", roles.listar());
         return "roles";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@RequestParam String nombre, HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
-        if (nombre.isBlank() || roles.existsByNombreRol(nombre.trim())) {
-            modelo.addAttribute("lista", roles.findAll());
-            modelo.addAttribute("error", "Nombre vacío o repetido.");
+    public String guardar(@RequestParam String nombre, Model modelo) {
+        try {
+            roles.registrar(nombre);
+        } catch (DatosInvalidosException e) {
+            modelo.addAttribute("lista", roles.listar());
+            modelo.addAttribute("error", e.getMessage());
             return "roles";
         }
-        Rol rol = new Rol();
-        rol.setNombreRol(nombre.trim());
-        roles.save(rol);
         return "redirect:/roles";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id, HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
+    @PostMapping("/{id}/estado")
+    public String estado(@PathVariable Integer id, @RequestParam boolean activo) {
+        roles.cambiarActivo(id, activo);
+        return "redirect:/roles";
+    }
+
+    @PostMapping("/{id}/eliminar")
+    public String eliminar(@PathVariable Integer id, Model modelo) {
         try {
-            roles.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            modelo.addAttribute("lista", roles.findAll());
-            modelo.addAttribute("error", "No se puede borrar: ya se usó en usuarios.");
+            roles.eliminar(id);
+        } catch (RuntimeException e) {
+            modelo.addAttribute("lista", roles.listar());
+            modelo.addAttribute("error", "No se puede borrar: ya se usa en usuarios. Desactívelo.");
             return "roles";
         }
         return "redirect:/roles";

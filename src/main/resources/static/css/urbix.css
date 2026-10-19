@@ -1,0 +1,439 @@
+:root {
+    --urbix-verde: #0d4f4a;
+    --urbix-verde-claro: #14635d;
+    --urbix-naranja: #e8622d;
+    --urbix-naranja-claro: #f47b45;
+    --urbix-fondo: #f4f7f6;
+    --urbix-borde: #dde6e4;
+    --urbix-texto: #1f2d2b;
+    --urbix-texto-suave: #6b7f7c;
+    --urbix-verde-estado: #2e7d32;
+    --urbix-rojo: #d32f2f;
+    --urbix-azul: #1976d2;
+    --urbix-ambar: #f9a825;
+}
+
+body {
+    background: var(--urbix-fondo);
+    color: var(--urbix-texto);
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+}
+
+.urbix-navbar {
+    background: var(--urbix-verde);
+    border-bottom: 3px dashed var(--urbix-naranja);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.urbix-marca {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.urbix-menu {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.urbix-enlace {
+    color: #d6e5e3;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.urbix-enlace:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.urbix-enlace.activo {
+    background: var(--urbix-naranja);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.urbix-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.urbix-usuario span {
+    display: block;
+    font-size: 12px;
+    color: #b9cfcd;
+    font-weight: 400;
+}
+
+.urbix-boton-salir {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    color: #ffffff;
+    background: transparent;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.urbix-boton-salir:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.urbix-contenido {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px 28px 64px;
+}
+
+.urbix-titulo {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.urbix-subtitulo {
+    color: var(--urbix-texto-suave);
+    font-size: 14px;
+    margin: 0 0 24px;
+}
+
+.urbix-fila-titulo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.urbix-tarjeta {
+    background: #ffffff;
+    border: 1px solid var(--urbix-borde);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 22px;
+}
+
+.urbix-tarjeta h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 16px;
+}
+
+.urbix-barra {
+    display: flex;
+    height: 22px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    background: #e6edeb;
+}
+
+.urbix-barra-roja { background: var(--urbix-rojo); }
+.urbix-barra-azul { background: var(--urbix-azul); }
+.urbix-barra-verde { background: var(--urbix-verde-estado); }
+
+.urbix-marcadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.urbix-marcador {
+    border: 1px solid var(--urbix-borde);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #fbfdfc;
+}
+
+.urbix-marcador b {
+    font-size: 26px;
+    display: block;
+    line-height: 1.1;
+}
+
+.urbix-marcador span {
+    font-size: 13px;
+    color: var(--urbix-texto-suave);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 4px;
+}
+
+.urbix-punto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+table.urbix-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.urbix-tabla th {
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--urbix-texto-suave);
+    background: #f0f5f4;
+    padding: 11px 12px;
+    font-weight: 600;
+}
+
+.urbix-tabla td {
+    padding: 13px 12px;
+    border-top: 1px solid var(--urbix-borde);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.urbix-tabla .principal {
+    font-weight: 600;
+    display: block;
+}
+
+.urbix-tabla .secundario {
+    color: var(--urbix-texto-suave);
+    font-size: 12.5px;
+}
+
+.urbix-etiqueta {
+    display: inline-block;
+    padding: 4px 13px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.urbix-etiqueta-reportada { background: var(--urbix-rojo); }
+.urbix-etiqueta-proceso { background: var(--urbix-verde-estado); }
+.urbix-etiqueta-solucionada { background: var(--urbix-verde-estado); }
+
+.urbix-foto {
+    width: 58px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 7px;
+    border: 1px solid var(--urbix-borde);
+    cursor: zoom-in;
+    display: block;
+}
+
+.urbix-foto:hover {
+    border-color: var(--urbix-naranja);
+}
+
+.urbix-foto-mini {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--urbix-borde);
+    cursor: pointer;
+    display: block;
+}
+
+.urbix-foto-mini:hover {
+    border-color: var(--urbix-naranja);
+}
+
+.urbix-visor {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(12, 26, 24, 0.82);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+}
+
+.urbix-visor.visible {
+    display: flex;
+}
+
+.urbix-visor-caja {
+    position: relative;
+    max-width: 1100px;
+    max-height: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.urbix-visor-caja img {
+    display: block;
+    max-width: 1060px;
+    max-height: 74vh;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.urbix-visor-cerrar {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--urbix-naranja);
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.urbix-visor-cerrar:hover {
+    background: var(--urbix-naranja-claro);
+}
+
+.urbix-visor-pie {
+    text-align: center;
+    font-size: 13px;
+    color: var(--urbix-texto-suave);
+    margin-top: 10px;
+}
+
+.urbix-mapa {
+    display: block;
+    border: 1px solid var(--urbix-borde);
+    border-radius: 7px;
+    margin-top: 4px;
+}
+
+.urbix-boton {
+    background: var(--urbix-naranja);
+    color: #ffffff;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.urbix-boton:hover {
+    background: var(--urbix-naranja-claro);
+}
+
+.urbix-boton-secundario {
+    background: #ffffff;
+    color: var(--urbix-verde);
+    border: 1px solid var(--urbix-verde);
+}
+
+.urbix-boton-secundario:hover {
+    background: #f0f5f4;
+}
+
+.urbix-alerta {
+    border-radius: 7px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+.urbix-alerta-error {
+    background: #fdecea;
+    color: #a02020;
+    border: 1px solid #f5c6c2;
+}
+
+input, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--urbix-borde);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #ffffff;
+    color: var(--urbix-texto);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--urbix-verde-claro);
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    color: var(--urbix-texto-suave);
+    margin-bottom: 5px;
+}
+
+.urbix-formulario {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.urbix-vacio {
+    text-align: center;
+    color: var(--urbix-texto-suave);
+    padding: 40px 0;
+}
+
+.urbix-acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.urbix-acciones select,
+.urbix-acciones input {
+    width: auto;
+    min-width: 130px;
+}
+
+.urbix-mini {
+    background: #ffffff;
+    border: 1px solid var(--urbix-borde);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--urbix-texto);
+}
+
+.urbix-mini:hover {
+    background: #f0f5f4;
+}
+
+.urbix-enlace-sutil {
+    color: var(--urbix-azul);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.urbix-enlace-sutil:hover {
+    text-decoration: underline;
+}

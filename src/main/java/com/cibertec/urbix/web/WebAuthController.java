@@ -1,10 +1,9 @@
 package com.cibertec.urbix.web;
 
 import com.cibertec.urbix.model.Usuario;
-import com.cibertec.urbix.repository.UsuarioRepository;
+import com.cibertec.urbix.service.AutenticacionService;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class WebAuthController {
 
-    private final UsuarioRepository usuarios;
-    private final PasswordEncoder clave;
+    private final AutenticacionService autenticacion;
 
-    public WebAuthController(UsuarioRepository usuarios, PasswordEncoder clave) {
-        this.usuarios = usuarios;
-        this.clave = clave;
+    public WebAuthController(AutenticacionService autenticacion) {
+        this.autenticacion = autenticacion;
     }
 
     @GetMapping({"/", "/login"})
@@ -28,15 +25,19 @@ public class WebAuthController {
     }
 
     @PostMapping("/login")
-    public String ingresar(@RequestParam String correo, @RequestParam String password,
+    public String ingresar(@RequestParam String correo, @RequestParam String clave,
             HttpSession sesion, Model modelo) {
-        Optional<Usuario> encontrado = usuarios.findByCorreo(correo.trim());
-        if (encontrado.isEmpty() || !encontrado.get().getActivo()
-                || !clave.matches(password, encontrado.get().getClaveHash())) {
+        Optional<Usuario> encontrado = autenticacion.validarCredenciales(correo, clave);
+        if (encontrado.isEmpty()) {
             modelo.addAttribute("error", "Correo o contraseña incorrectos.");
             return "login";
         }
-        sesion.setAttribute("usuario", encontrado.get().getNombre());
+        Usuario usuario = encontrado.get();
+        if (!usuario.esAdministrador()) {
+            modelo.addAttribute("error", "Esta cuenta no tiene acceso al portal de gestión.");
+            return "login";
+        }
+        SesionPortal.abrir(sesion, usuario);
         return "redirect:/incidencias";
     }
 

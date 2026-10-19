@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:replace="~{fragments :: pagina('Panel', ~{::cuerpo})}">
+<body>
+<div th:fragment="cuerpo">
+    <div class="urbix-fila-titulo">
+        <div>
+            <h1 class="urbix-titulo">Panel</h1>
+            <p class="urbix-subtitulo">Cómo va la atención de las incidencias reportadas.</p>
+        </div>
+        <a class="urbix-boton" th:href="@{/incidencias}">Nueva incidencia</a>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <h3><span th:text="${total}">0</span> incidencias registradas</h3>
+        <div class="urbix-barra">
+            <div class="urbix-barra-roja"
+                 th:styleappend="'width:' + (${total} == 0 ? 0 : ${reportadas} * 100 / ${total}) + '%'"></div>
+            <div class="urbix-barra-azul"
+                 th:styleappend="'width:' + (${total} == 0 ? 0 : ${enProceso} * 100 / ${total}) + '%'"></div>
+            <div class="urbix-barra-verde"
+                 th:styleappend="'width:' + (${total} == 0 ? 0 : ${solucionadas} * 100 / ${total}) + '%'"></div>
+        </div>
+        <div class="urbix-marcadores">
+            <div class="urbix-marcador">
+                <b th:text="${reportadas}">0</b>
+                <span><i class="urbix-punto" style="background: var(--urbix-rojo)"></i> Reportada</span>
+            </div>
+            <div class="urbix-marcador">
+                <b th:text="${enProceso}">0</b>
+                <span><i class="urbix-punto" style="background: var(--urbix-azul)"></i> En Proceso</span>
+            </div>
+            <div class="urbix-marcador">
+                <b th:text="${solucionadas}">0</b>
+                <span><i class="urbix-punto" style="background: var(--urbix-verde-estado)"></i> Solucionada</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <h3>Últimas incidencias
+            <a class="urbix-enlace-sutil" style="float: right;" th:href="@{/incidencias}">Ver todas</a>
+        </h3>
+        <table class="urbix-tabla">
+            <thead>
+            <tr>
+                <th>Incidencia</th>
+                <th>Zona</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Foto</th>
+                <th>Ubicación</th>
+                <th>Registrada</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:replace="~{fragments-incidencia :: filas(${recientes}, false)}"></th:block>
+            <tr th:if="${#lists.isEmpty(recientes)}">
+                <td colspan="7" class="urbix-vacio">
+                    Todavía no hay incidencias sincronizadas desde la app.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Urbix - Error</title>
+    <link rel="stylesheet" th:href="@{/css/urbix.css}">
+</head>
+<body>
+<nav class="urbix-navbar">
+    <a class="urbix-marca" href="/panel">Urbix</a>
+    <div class="urbix-menu">
+        <a class="urbix-enlace" href="/panel">Panel</a>
+        <a class="urbix-enlace" href="/incidencias">Incidencias</a>
+        <a class="urbix-enlace" href="/categorias">Categorías</a>
+        <a class="urbix-enlace" href="/zonas">Zonas</a>
+    </div>
+    <div></div>
+</nav>
+<div class="urbix-contenido">
+    <div class="urbix-tarjeta">
+        <h3 th:text="${titulo}">Ocurrió un error</h3>
+        <p class="urbix-subtitulo" th:text="${detalle}"></p>
+        <a class="urbix-boton" href="/panel">Volver al panel</a>
+    </div>
+</div>
+</body>
+</html>

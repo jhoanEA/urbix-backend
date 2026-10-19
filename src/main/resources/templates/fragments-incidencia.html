@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="filas(lista, conAcciones)">
+    <tr th:each="i : ${lista}">
+        <td>
+            <span class="principal" th:text="${i.categoria}">Categoría</span>
+            <span class="secundario" th:text="${i.descripcion}">Descripción</span>
+        </td>
+        <td th:text="${i.zona}">Zona</td>
+        <td>
+            <span class="urbix-acciones">
+                <span class="urbix-punto"
+                      th:styleappend="${i.prioridad == 'Alta'} ? 'background: var(--urbix-rojo)' : (${i.prioridad == 'Media'} ? 'background: var(--urbix-ambar)' : 'background: var(--urbix-verde-estado)')"></span>
+                <span th:text="${i.prioridad}">Prioridad</span>
+            </span>
+        </td>
+        <td>
+            <span class="urbix-etiqueta"
+                  th:classappend="${i.estado == 'Reportada'} ? 'urbix-etiqueta-reportada' : 'urbix-etiqueta-proceso'"
+                  th:text="${i.estado}">Estado</span>
+        </td>
+        <td>
+            <span class="urbix-acciones">
+                <img th:if="${i.conFoto}" class="urbix-foto-mini"
+                     th:src="@{/incidencias/{codigo}/foto(codigo=${i.codigo})}"
+                     th:attr="onclick='urbixAbrirFoto(\'' + @{/incidencias/{codigo}/foto(codigo=${i.codigo})} + '\')'"
+                     alt="Ver foto de la incidencia">
+                <a th:if="${i.conFoto}" class="urbix-mini"
+                   th:href="@{/incidencias/{codigo}/foto(codigo=${i.codigo})}"
+                   target="_blank">Ver foto</a>
+                <span th:unless="${i.conFoto}" class="secundario">Sin foto</span>
+            </span>
+        </td>
+        <td>
+            <span th:if="${i.tieneUbicacion()}" th:text="${i.ubicacion}">Coordenadas</span>
+            <a th:if="${i.tieneUbicacion()}" class="urbix-enlace-sutil" target="_blank"
+               th:href="${i.enlaceMapa}">Ver mapa</a>
+            <span th:if="${!i.tieneUbicacion()}" class="secundario">Sin GPS</span>
+        </td>
+        <td th:text="${i.fecha}">Fecha</td>
+        <td th:if="${conAcciones}">
+            <span class="urbix-acciones">
+                <a class="urbix-mini" target="_blank"
+                   th:href="@{/fichas/{codigo}.pdf(codigo=${i.codigo})}">Ficha PDF</a>
+                <form method="post" th:action="@{/incidencias/{id}/seguimiento(id=${i.id})}"
+                      class="urbix-acciones">
+                    <select name="estado">
+                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"
+                                th:selected="${e == i.estado}"></option>
+                    </select>
+                    <button class="urbix-mini">OK</button>
+                </form>
+            </span>
+        </td>
+    </tr>
+</th:block>
+
+<th:block th:fragment="visor">
+    <div class="urbix-visor" id="urbix-visor">
+        <div class="urbix-visor-caja">
+            <button class="urbix-visor-cerrar" onclick="urbixCerrarFoto()">&times;</button>
+            <img id="urbix-visor-imagen" src="" alt="Foto ampliada de la incidencia">
+            <div class="urbix-visor-pie">Use la tecla Esc o el fondo para cerrar</div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

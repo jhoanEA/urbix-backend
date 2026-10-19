@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ficha" pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20"
+              topMargin="20" bottomMargin="20">
+
+    <parameter name="generadoEn" class="java.lang.String"/>
+
+    <field name="codigo" class="java.lang.String"/>
+    <field name="categoria" class="java.lang.String"/>
+    <field name="zona" class="java.lang.String"/>
+    <field name="descripcion" class="java.lang.String"/>
+    <field name="prioridad" class="java.lang.String"/>
+    <field name="estado" class="java.lang.String"/>
+    <field name="inspector" class="java.lang.String"/>
+    <field name="fecha" class="java.lang.String"/>
+
+    <title>
+        <band height="96" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="76" backcolor="#0D4F4A"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="20" y="10" width="380" height="28" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Left">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Urbix - Ficha de Incidencia]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="20" y="40" width="380" height="16" forecolor="#B9CFCD"/>
+                <textElement textAlignment="Left">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Generado el " + $P{generadoEn}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="12" width="135" height="22" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["CÓDIGO"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="34" width="135" height="18" forecolor="#B9CFCD"/>
+                <textElement textAlignment="Center">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="190" splitType="Stretch">
+
+            <staticText>
+                <reportElement x="20" y="10" width="120" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Categoría:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="145" y="10" width="180" height="18"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{categoria}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="335" y="10" width="90" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Prioridad:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="425" y="10" width="110" height="18"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{prioridad}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="20" y="32" width="120" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Zona:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="145" y="32" width="180" height="18"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{zona}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="335" y="32" width="90" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Estado:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="425" y="32" width="110" height="18"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{estado}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="20" y="54" width="120" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Inspector:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="145" y="54" width="180" height="18"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{inspector}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="335" y="54" width="90" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Registrada:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="425" y="54" width="110" height="18"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="20" y="80" width="515" height="1" forecolor="#DDE6E4"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#DDE6E4"/>
+                </graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement x="20" y="92" width="200" height="18" forecolor="#6B7F7C"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Detalle de la avería]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="20" y="114" width="515" height="60"/>
+                <textElement verticalAlignment="Top">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="26">
+            <line>
+                <reportElement x="0" y="2" width="555" height="1" forecolor="#DDE6E4"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#DDE6E4"/>
+                </graphicElement>
+            </line>
+            <textField>
+                <reportElement x="0" y="8" width="555" height="14"/>
+                <textElement textAlignment="Center">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Urbix - Sistema de incidencias urbanas | Documento generado automáticamente"]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

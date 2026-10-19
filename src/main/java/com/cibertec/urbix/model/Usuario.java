@@ -26,6 +26,9 @@ public class Usuario {
     @Column(name = "clave_hash", nullable = false, length = 100)
     private String claveHash;
 
+    @Column(length = 64)
+    private String token;
+
     @Column(nullable = false)
     private Boolean activo = true;
 
@@ -65,6 +68,14 @@ public class Usuario {
         this.claveHash = claveHash;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public Boolean getActivo() {
         return activo;
     }
@@ -79,5 +90,9 @@ public class Usuario {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public boolean esAdministrador() {
+        return rol != null && Rol.ADMINISTRADOR.equals(rol.getNombreRol());
     }
 }

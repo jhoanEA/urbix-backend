@@ -1,31 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
       th:replace="~{fragments :: pagina('Incidencias', ~{::cuerpo})}">
 <body>
 <div th:fragment="cuerpo">
-    <h3>Incidencias sincronizadas</h3>
-    <table class="table table-striped bg-white">
-        <thead><tr><th>Código</th><th>Categoría</th><th>Zona</th><th>Descripción</th><th>Estado</th><th>Cuadrilla</th><th></th></tr></thead>
-        <tbody>
-        <tr th:each="i : ${lista}">
-            <td th:text="${i.clientUuid}"></td>
-            <td th:text="${i.categoria != null ? i.categoria.nombreCategoria : ''}"></td>
-            <td th:text="${i.zona != null ? i.zona.nombreSector : ''}"></td>
-            <td th:text="${i.descripcion}"></td>
-            <td th:text="${i.estado}"></td>
-            <td th:text="${i.cuadrillaAsignada}"></td>
-            <td>
-                <form method="post" th:action="@{/incidencias/{id}/estado(id=${i.idIncidencia})}" class="d-flex gap-1">
-                    <select name="estado" class="form-select form-select-sm">
-                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == i.estado}"></option>
-                    </select>
-                    <input name="cuadrilla" class="form-control form-control-sm" placeholder="Cuadrilla" th:value="${i.cuadrillaAsignada}">
-                    <button class="btn btn-sm btn-primary">OK</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="urbix-fila-titulo">
+        <div>
+            <h1 class="urbix-titulo">Incidencias</h1>
+            <p class="urbix-subtitulo">
+                Seguimiento de los reportes recibidos del campo.
+                <span th:if="${lista.size() < total}" th:text="'Mostrando ' + ${lista.size()} + ' de ' + ${total} + '.'"></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <h3>Buscar y filtrar</h3>
+        <form method="get" action="/incidencias" class="urbix-formulario"
+              style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;">
+            <div>
+                <label for="texto">Texto</label>
+                <input type="text" id="texto" name="texto" th:value="${textoActual}"
+                       placeholder="Categoría, zona o detalle">
+            </div>
+            <div>
+                <label for="estado">Estado</label>
+                <select id="estado" name="estado">
+                    <option value="">Todos</option>
+                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"
+                            th:selected="${e == estadoActual}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="categoria">Categoría</label>
+                <select id="categoria" name="categoria">
+                    <option value="">Todas</option>
+                    <option th:each="c : ${categorias}" th:value="${c}" th:text="${c}"
+                            th:selected="${c == categoriaActual}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="zona">Zona</label>
+                <select id="zona" name="zona">
+                    <option value="">Todas</option>
+                    <option th:each="z : ${zonas}" th:value="${z}" th:text="${z}"
+                            th:selected="${z == zonaActual}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="prioridad">Prioridad</label>
+                <select id="prioridad" name="prioridad">
+                    <option value="">Todas</option>
+                    <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p}"
+                            th:selected="${p == prioridadActual}"></option>
+                </select>
+            </div>
+            <button type="submit" class="urbix-boton">Filtrar</button>
+        </form>
+        <p style="margin: 14px 0 0;">
+            <a class="urbix-enlace-sutil" th:href="@{/incidencias}">Limpiar filtros</a>
+        </p>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <div th:if="${error}" class="urbix-alerta urbix-alerta-error" th:text="${error}"></div>
+        <table class="urbix-tabla">
+            <thead>
+            <tr>
+                <th>Incidencia</th>
+                <th>Zona</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Foto</th>
+                <th>Ubicación</th>
+                <th>Registrada</th>
+                <th>Seguimiento</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:replace="~{fragments-incidencia :: filas(${lista}, true)}"></th:block>
+            <tr th:if="${#lists.isEmpty(lista)}">
+                <td colspan="8" class="urbix-vacio">
+                    No hay incidencias que coincidan con el filtro aplicado.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

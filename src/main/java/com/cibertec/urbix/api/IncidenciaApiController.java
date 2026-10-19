@@ -1,137 +1,89 @@
 package com.cibertec.urbix.api;
 
-import com.cibertec.urbix.model.Categoria;
+import com.cibertec.urbix.dto.EstadoRequest;
+import com.cibertec.urbix.dto.IncidenciaRequest;
+import com.cibertec.urbix.dto.IncidenciaResponse;
+import com.cibertec.urbix.media.TipoImagen;
 import com.cibertec.urbix.model.Incidencia;
-import com.cibertec.urbix.model.Zona;
-import com.cibertec.urbix.repository.CategoriaRepository;
-import com.cibertec.urbix.repository.IncidenciaRepository;
-import com.cibertec.urbix.repository.ZonaRepository;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.cibertec.urbix.model.Usuario;
+import com.cibertec.urbix.service.AutenticacionService;
+import com.cibertec.urbix.service.IncidenciaService;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/incidencias")
 public class IncidenciaApiController {
 
-    private final IncidenciaRepository incidencias;
-    private final CategoriaRepository categorias;
-    private final ZonaRepository zonas;
+    private final AutenticacionService autenticacion;
+    private final IncidenciaService incidencias;
 
-    private static final Set<String> ESTADOS = Set.of("Reportada", "En Proceso", "Solucionada");
-
-    public IncidenciaApiController(IncidenciaRepository incidencias,
-            CategoriaRepository categorias, ZonaRepository zonas) {
+    public IncidenciaApiController(AutenticacionService autenticacion,
+            IncidenciaService incidencias) {
+        this.autenticacion = autenticacion;
         this.incidencias = incidencias;
-        this.categorias = categorias;
-        this.zonas = zonas;
     }
 
     @GetMapping
-    public ResponseEntity<?> listar() {
-        List<Map<String, Object>> respuesta = new ArrayList<>();
-        for (Incidencia i : incidencias.findAllByOrderByIdIncidenciaDesc()) {
-            Map<String, Object> fila = new HashMap<>();
-            fila.put("client_uuid", i.getClientUuid());
-            fila.put("categoria", i.getCategoria() != null ? i.getCategoria().getNombreCategoria() : "");
-            fila.put("zona", i.getZona() != null ? i.getZona().getNombreSector() : "");
-            fila.put("descripcion", i.getDescripcion());
-            fila.put("estado", i.getEstado());
-            respuesta.add(fila);
+    public ResponseEntity<?> listar(@RequestHeader(value = "X-Token", required = false) String token) {
+        Optional<Usuario> autor = autenticacion.porToken(token);
+        if (autor.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(respuesta);
+        List<IncidenciaResponse> lista = incidencias.listar();
+        return ResponseEntity.ok(lista);
     }
 
-    @PostMapping
-    public ResponseEntity<?> recibir(@RequestBody Map<String, Object> datos) {
-        String uuid = String.valueOf(datos.getOrDefault("client_uuid", "")).trim();
-        if (uuid.isBlank()) {
-            return ResponseEntity.badRequest().build();
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> recibir(@RequestHeader(value = "X-Token", required = false) String token,
+            @Valid @RequestPart("datos") IncidenciaRequest datos,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+        Optional<Usuario> autor = autenticacion.porToken(token);
+        if (autor.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (incidencias.existsByClientUuid(uuid)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        Incidencia incidencia = new Incidencia();
-        incidencia.setClientUuid(uuid);
-        incidencia.setDescripcion(String.valueOf(datos.getOrDefault("descripcion", "")));
-        incidencia.setEstado(valido(String.valueOf(datos.getOrDefault("estado", "Reportada"))));
-        incidencia.setCategoria(buscarCategoria(String.valueOf(datos.getOrDefault("categoria", ""))));
-        incidencia.setZona(buscarZona(String.valueOf(datos.getOrDefault("zona", ""))));
-        incidencia.setLatitud(numero(datos.get("latitud")));
-        incidencia.setLongitud(numero(datos.get("longitud")));
-        Object foto = datos.get("foto");
-        incidencia.setFotoUrl(foto == null ? null : String.valueOf(foto));
-        incidencias.save(incidencia);
+        incidencias.registrar(datos, foto, autor.get());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/{uuid}/estado")
-    public ResponseEntity<?> cambiarEstado(@PathVariable String uuid,
-            @RequestBody Map<String, String> datos) {
-        Optional<Incidencia> encontrada = incidencias.findByClientUuid(uuid);
-        if (encontrada.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> cambiarEstado(
+            @RequestHeader(value = "X-Token", required = false) String token,
+            @PathVariable String uuid,
+            @Valid @RequestBody EstadoRequest solicitud) {
+        if (autenticacion.porToken(token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String estado = datos.getOrDefault("estado", "").trim();
-        if (!ESTADOS.contains(estado)) {
-            return ResponseEntity.badRequest().build();
-        }
-        Incidencia incidencia = encontrada.get();
-        incidencia.setEstado(estado);
-        incidencias.save(incidencia);
+        incidencias.cambiarEstado(uuid, solicitud);
         return ResponseEntity.ok().build();
     }
 
-    private String valido(String estado) {
-        return ESTADOS.contains(estado) ? estado : "Reportada";
-    }
-
-    private Categoria buscarCategoria(String nombre) {
-        if (nombre.isBlank()) {
-            return null;
+    @GetMapping("/{uuid}/foto")
+    public ResponseEntity<byte[]> foto(
+            @RequestHeader(value = "X-Token", required = false) String token,
+            @PathVariable String uuid) {
+        if (autenticacion.porToken(token).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Optional<Categoria> encontrada = categorias.findByNombreCategoria(nombre);
-        if (encontrada.isPresent()) {
-            return encontrada.get();
-        }
-        Categoria nueva = new Categoria();
-        nueva.setNombreCategoria(nombre);
-        return categorias.save(nueva);
-    }
-
-    private Zona buscarZona(String nombre) {
-        if (nombre.isBlank()) {
-            return null;
-        }
-        Optional<Zona> encontrada = zonas.findByNombreSector(nombre);
-        if (encontrada.isPresent()) {
-            return encontrada.get();
-        }
-        Zona nueva = new Zona();
-        nueva.setNombreSector(nombre);
-        return zonas.save(nueva);
-    }
-
-    private Double numero(Object valor) {
-        if (valor == null) {
-            return null;
-        }
-        try {
-            return Double.valueOf(String.valueOf(valor));
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        Incidencia incidencia = incidencias.conFoto(uuid);
+        HttpHeaders cabeceras = new HttpHeaders();
+        cabeceras.setContentType(TipoImagen.de(incidencia.getFoto()));
+        cabeceras.setContentLength(incidencia.getFoto().length);
+        return new ResponseEntity<>(incidencia.getFoto(), cabeceras, HttpStatus.OK);
     }
 }

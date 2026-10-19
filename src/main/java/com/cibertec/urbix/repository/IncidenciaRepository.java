@@ -12,4 +12,6 @@ public interface IncidenciaRepository extends JpaRepository<Incidencia, Integer>
     boolean existsByClientUuid(String clientUuid);
 
     List<Incidencia> findAllByOrderByIdIncidenciaDesc();
+
+    long countByEstado(String estado);
 }

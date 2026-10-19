@@ -1,23 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
       th:replace="~{fragments :: pagina('Categorías', ~{::cuerpo})}">
 <body>
 <div th:fragment="cuerpo">
-    <h3>Categorías de avería</h3>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-    <form method="post" action="/categorias/guardar" class="row g-2 mb-4">
-        <div class="col-md-8"><input name="nombre" class="form-control" placeholder="Nombre de la categoría" required></div>
-        <div class="col-md-4"><button class="btn btn-primary w-100">Agregar</button></div>
-    </form>
-    <table class="table table-striped bg-white">
-        <thead><tr><th>Nombre</th><th></th></tr></thead>
-        <tbody>
-        <tr th:each="c : ${lista}">
-            <td th:text="${c.nombreCategoria}"></td>
-            <td class="text-end"><a th:href="@{/categorias/eliminar/{id}(id=${c.idCategoria})}" class="btn btn-sm btn-danger">Eliminar</a></td>
-        </tr>
-        </tbody>
-    </table>
+    <h1 class="urbix-titulo">Categorías</h1>
+    <p class="urbix-subtitulo">Tipos de avería que la app descarga como catálogo.</p>
+
+    <div th:if="${error}" class="urbix-alerta urbix-alerta-error" th:text="${error}"></div>
+
+    <div class="urbix-tarjeta">
+        <form method="post" action="/categorias/guardar" class="urbix-formulario">
+            <div>
+                <label for="nombre">Nombre de la avería</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej. Alumbrado Público" required>
+            </div>
+            <div></div>
+            <button type="submit" class="urbix-boton">Agregar</button>
+        </form>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <h3>Categorías registradas</h3>
+        <table class="urbix-tabla">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th style="width: 250px;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${lista}">
+                <td th:text="${c.nombreCategoria}"></td>
+                <td>
+                    <span class="urbix-etiqueta"
+                          th:classappend="${c.activo} ? 'urbix-etiqueta-proceso' : 'urbix-etiqueta-reportada'"
+                          th:text="${c.activo} ? 'Activo' : 'Inactivo'"></span>
+                </td>
+                <td>
+                    <span class="urbix-acciones">
+                        <form method="post" th:if="${c.activo}"
+                              th:action="@{/categorias/{id}/estado(id=${c.idCategoria})}">
+                            <input type="hidden" name="activo" value="false">
+                            <button class="urbix-mini">Desactivar</button>
+                        </form>
+                        <form method="post" th:unless="${c.activo}"
+                              th:action="@{/categorias/{id}/estado(id=${c.idCategoria})}">
+                            <input type="hidden" name="activo" value="true">
+                            <button class="urbix-mini">Activar</button>
+                        </form>
+                        <form method="post" th:action="@{/categorias/{id}/eliminar(id=${c.idCategoria})}">
+                            <button class="urbix-mini">Eliminar</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(lista)}">
+                <td colspan="3" class="urbix-vacio">No hay categorías registradas.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

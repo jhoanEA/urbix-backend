@@ -1,9 +1,7 @@
 package com.cibertec.urbix.web;
 
-import com.cibertec.urbix.model.Categoria;
-import com.cibertec.urbix.repository.CategoriaRepository;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.dao.DataIntegrityViolationException;
+import com.cibertec.urbix.exception.DatosInvalidosException;
+import com.cibertec.urbix.service.CategoriaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,51 +14,43 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/categorias")
 public class CategoriaController {
 
-    private final CategoriaRepository categorias;
+    private final CategoriaService categorias;
 
-    public CategoriaController(CategoriaRepository categorias) {
+    public CategoriaController(CategoriaService categorias) {
         this.categorias = categorias;
     }
 
-    private boolean sesion(HttpSession sesion) {
-        return sesion.getAttribute("usuario") != null;
-    }
-
     @GetMapping
-    public String listar(HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
-        modelo.addAttribute("lista", categorias.findAll());
+    public String listar(Model modelo) {
+        modelo.addAttribute("lista", categorias.listar());
         return "categorias";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@RequestParam String nombre, HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
-        if (nombre.isBlank() || categorias.existsByNombreCategoria(nombre.trim())) {
-            modelo.addAttribute("lista", categorias.findAll());
-            modelo.addAttribute("error", "Nombre vacío o repetido.");
+    public String guardar(@RequestParam String nombre, Model modelo) {
+        try {
+            categorias.registrar(nombre);
+        } catch (DatosInvalidosException e) {
+            modelo.addAttribute("lista", categorias.listar());
+            modelo.addAttribute("error", e.getMessage());
             return "categorias";
         }
-        Categoria categoria = new Categoria();
-        categoria.setNombreCategoria(nombre.trim());
-        categorias.save(categoria);
         return "redirect:/categorias";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id, HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
+    @PostMapping("/{id}/estado")
+    public String estado(@PathVariable Integer id, @RequestParam boolean activo) {
+        categorias.cambiarActivo(id, activo);
+        return "redirect:/categorias";
+    }
+
+    @PostMapping("/{id}/eliminar")
+    public String eliminar(@PathVariable Integer id, Model modelo) {
         try {
-            categorias.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            modelo.addAttribute("lista", categorias.findAll());
-            modelo.addAttribute("error", "No se puede borrar: ya se usó en incidencias.");
+            categorias.eliminar(id);
+        } catch (RuntimeException e) {
+            modelo.addAttribute("lista", categorias.listar());
+            modelo.addAttribute("error", "No se puede borrar: ya se usa en incidencias. Desactívela.");
             return "categorias";
         }
         return "redirect:/categorias";

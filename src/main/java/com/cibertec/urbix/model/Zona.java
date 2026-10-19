@@ -21,6 +21,9 @@ public class Zona {
     @Column(name = "nombre_sector", nullable = false, unique = true, length = 100)
     private String nombreSector;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     public Integer getIdZona() {
         return idZona;
     }
@@ -43,5 +46,13 @@ public class Zona {
 
     public void setNombreSector(String nombreSector) {
         this.nombreSector = nombreSector;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

@@ -18,6 +18,9 @@ public class Categoria {
     @Column(name = "nombre_categoria", nullable = false, unique = true, length = 100)
     private String nombreCategoria;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     public Integer getIdCategoria() {
         return idCategoria;
     }
@@ -32,5 +35,13 @@ public class Categoria {
 
     public void setNombreCategoria(String nombreCategoria) {
         this.nombreCategoria = nombreCategoria;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

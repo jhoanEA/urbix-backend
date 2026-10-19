@@ -1,9 +1,9 @@
 package com.cibertec.urbix.web;
 
-import com.cibertec.urbix.model.Zona;
-import com.cibertec.urbix.repository.ZonaRepository;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.dao.DataIntegrityViolationException;
+import com.cibertec.urbix.dto.ZonaRequest;
+import com.cibertec.urbix.exception.DatosInvalidosException;
+import com.cibertec.urbix.service.ZonaService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,53 +16,43 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/zonas")
 public class ZonaController {
 
-    private final ZonaRepository zonas;
+    private final ZonaService zonas;
 
-    public ZonaController(ZonaRepository zonas) {
+    public ZonaController(ZonaService zonas) {
         this.zonas = zonas;
     }
 
-    private boolean sesion(HttpSession sesion) {
-        return sesion.getAttribute("usuario") != null;
-    }
-
     @GetMapping
-    public String listar(HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
-        modelo.addAttribute("lista", zonas.findAll());
+    public String listar(Model modelo) {
+        modelo.addAttribute("lista", zonas.listar());
         return "zonas";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@RequestParam String distrito, @RequestParam String sector,
-            HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
-        if (sector.isBlank() || zonas.existsByNombreSector(sector.trim())) {
-            modelo.addAttribute("lista", zonas.findAll());
-            modelo.addAttribute("error", "Sector vacío o repetido.");
+    public String guardar(@Valid ZonaRequest solicitud, Model modelo) {
+        try {
+            zonas.registrar(solicitud);
+        } catch (DatosInvalidosException e) {
+            modelo.addAttribute("lista", zonas.listar());
+            modelo.addAttribute("error", e.getMessage());
             return "zonas";
         }
-        Zona zona = new Zona();
-        zona.setDistrito(distrito.trim());
-        zona.setNombreSector(sector.trim());
-        zonas.save(zona);
         return "redirect:/zonas";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id, HttpSession sesion, Model modelo) {
-        if (!sesion(sesion)) {
-            return "redirect:/login";
-        }
+    @PostMapping("/{id}/estado")
+    public String estado(@PathVariable Integer id, @RequestParam boolean activo) {
+        zonas.cambiarActivo(id, activo);
+        return "redirect:/zonas";
+    }
+
+    @PostMapping("/{id}/eliminar")
+    public String eliminar(@PathVariable Integer id, Model modelo) {
         try {
-            zonas.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            modelo.addAttribute("lista", zonas.findAll());
-            modelo.addAttribute("error", "No se puede borrar: ya se usó en incidencias.");
+            zonas.eliminar(id);
+        } catch (RuntimeException e) {
+            modelo.addAttribute("lista", zonas.listar());
+            modelo.addAttribute("error", "No se puede borrar: ya se usa en incidencias. Desactívela.");
             return "zonas";
         }
         return "redirect:/zonas";

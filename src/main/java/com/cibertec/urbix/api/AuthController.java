@@ -1,14 +1,15 @@
 package com.cibertec.urbix.api;
 
-import com.cibertec.urbix.model.Usuario;
-import com.cibertec.urbix.repository.UsuarioRepository;
-import java.util.Map;
+import com.cibertec.urbix.dto.LoginRequest;
+import com.cibertec.urbix.dto.LoginResponse;
+import com.cibertec.urbix.service.AutenticacionService;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,23 +17,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UsuarioRepository usuarios;
-    private final PasswordEncoder clave;
+    private final AutenticacionService autenticacion;
 
-    public AuthController(UsuarioRepository usuarios, PasswordEncoder clave) {
-        this.usuarios = usuarios;
-        this.clave = clave;
+    public AuthController(AutenticacionService autenticacion) {
+        this.autenticacion = autenticacion;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> datos) {
-        String correo = datos.getOrDefault("correo", "").trim();
-        String password = datos.getOrDefault("clave", "");
-        Optional<Usuario> encontrado = usuarios.findByCorreo(correo);
-        if (encontrado.isEmpty() || !encontrado.get().getActivo()
-                || !clave.matches(password, encontrado.get().getClaveHash())) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest solicitud) {
+        Optional<LoginResponse> respuesta = autenticacion.ingresar(solicitud);
+        if (respuesta.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(Map.of("rol", encontrado.get().getRol().getNombreRol()));
+        return ResponseEntity.ok(respuesta.get());
+    }
+
+    @PostMapping("/salir")
+    public ResponseEntity<?> salir(@RequestHeader(value = "X-Token", required = false) String token) {
+        autenticacion.cerrarSesion(token);
+        return ResponseEntity.ok().build();
     }
 }

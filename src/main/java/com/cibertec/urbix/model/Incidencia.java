@@ -6,8 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "incidencias")
@@ -23,18 +25,24 @@ public class Incidencia {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
+    @Column(nullable = false, length = 20)
+    private String prioridad;
+
+    @Column(nullable = false, length = 30)
+    private String estado;
+
+    @Column(name = "foto_nombre", length = 160)
+    private String fotoNombre;
+
+    @Lob
+    private byte[] foto;
+
     private Double latitud;
 
     private Double longitud;
 
-    @Column(name = "foto_url", length = 255)
-    private String fotoUrl;
-
-    @Column(name = "cuadrilla_asignada", length = 100)
-    private String cuadrillaAsignada;
-
-    @Column(nullable = false, length = 30)
-    private String estado;
+    @Column(name = "fecha_registro", nullable = false)
+    private LocalDateTime fechaRegistro;
 
     @ManyToOne
     @JoinColumn(name = "id_categoria")
@@ -72,6 +80,38 @@ public class Incidencia {
         this.descripcion = descripcion;
     }
 
+    public String getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(String prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getFotoNombre() {
+        return fotoNombre;
+    }
+
+    public void setFotoNombre(String fotoNombre) {
+        this.fotoNombre = fotoNombre;
+    }
+
+    public byte[] getFoto() {
+        return foto;
+    }
+
+    public void setFoto(byte[] foto) {
+        this.foto = foto;
+    }
+
     public Double getLatitud() {
         return latitud;
     }
@@ -88,28 +128,12 @@ public class Incidencia {
         this.longitud = longitud;
     }
 
-    public String getFotoUrl() {
-        return fotoUrl;
+    public LocalDateTime getFechaRegistro() {
+        return fechaRegistro;
     }
 
-    public void setFotoUrl(String fotoUrl) {
-        this.fotoUrl = fotoUrl;
-    }
-
-    public String getCuadrillaAsignada() {
-        return cuadrillaAsignada;
-    }
-
-    public void setCuadrillaAsignada(String cuadrillaAsignada) {
-        this.cuadrillaAsignada = cuadrillaAsignada;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 
     public Categoria getCategoria() {
@@ -134,5 +158,9 @@ public class Incidencia {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public boolean tieneFoto() {
+        return foto != null && foto.length > 0;
     }
 }

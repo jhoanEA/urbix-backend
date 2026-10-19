@@ -1,25 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
       th:replace="~{fragments :: pagina('Zonas', ~{::cuerpo})}">
 <body>
 <div th:fragment="cuerpo">
-    <h3>Zonas de trabajo</h3>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-    <form method="post" action="/zonas/guardar" class="row g-2 mb-4">
-        <div class="col-md-4"><input name="distrito" class="form-control" placeholder="Distrito"></div>
-        <div class="col-md-4"><input name="sector" class="form-control" placeholder="Sector (ej. Sector 1 - Cercado)" required></div>
-        <div class="col-md-4"><button class="btn btn-primary w-100">Agregar</button></div>
-    </form>
-    <table class="table table-striped bg-white">
-        <thead><tr><th>Distrito</th><th>Sector</th><th></th></tr></thead>
-        <tbody>
-        <tr th:each="z : ${lista}">
-            <td th:text="${z.distrito}"></td>
-            <td th:text="${z.nombreSector}"></td>
-            <td class="text-end"><a th:href="@{/zonas/eliminar/{id}(id=${z.idZona})}" class="btn btn-sm btn-danger">Eliminar</a></td>
-        </tr>
-        </tbody>
-    </table>
+    <h1 class="urbix-titulo">Zonas</h1>
+    <p class="urbix-subtitulo">Sectores de trabajo donde se registran las incidencias.</p>
+
+    <div th:if="${error}" class="urbix-alerta urbix-alerta-error" th:text="${error}"></div>
+
+    <div class="urbix-tarjeta">
+        <form method="post" action="/zonas/guardar" class="urbix-formulario">
+            <div>
+                <label for="sector">Sector</label>
+                <input type="text" id="sector" name="sector" placeholder="Ej. Sector 1 - Cercado" required>
+            </div>
+            <div>
+                <label for="distrito">Distrito</label>
+                <input type="text" id="distrito" name="distrito" placeholder="Ej. Cercado">
+            </div>
+            <button type="submit" class="urbix-boton">Agregar</button>
+        </form>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <h3>Zonas registradas</h3>
+        <table class="urbix-tabla">
+            <thead>
+            <tr>
+                <th>Distrito</th>
+                <th>Sector</th>
+                <th>Estado</th>
+                <th style="width: 250px;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="z : ${lista}">
+                <td th:text="${z.distrito}"></td>
+                <td th:text="${z.nombreSector}"></td>
+                <td>
+                    <span class="urbix-etiqueta"
+                          th:classappend="${z.activo} ? 'urbix-etiqueta-proceso' : 'urbix-etiqueta-reportada'"
+                          th:text="${z.activo} ? 'Activo' : 'Inactivo'"></span>
+                </td>
+                <td>
+                    <span class="urbix-acciones">
+                        <form method="post" th:if="${z.activo}"
+                              th:action="@{/zonas/{id}/estado(id=${z.idZona})}">
+                            <input type="hidden" name="activo" value="false">
+                            <button class="urbix-mini">Desactivar</button>
+                        </form>
+                        <form method="post" th:unless="${z.activo}"
+                              th:action="@{/zonas/{id}/estado(id=${z.idZona})}">
+                            <input type="hidden" name="activo" value="true">
+                            <button class="urbix-mini">Activar</button>
+                        </form>
+                        <form method="post" th:action="@{/zonas/{id}/eliminar(id=${z.idZona})}">
+                            <button class="urbix-mini">Eliminar</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(lista)}">
+                <td colspan="4" class="urbix-vacio">No hay zonas registradas.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

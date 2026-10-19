@@ -1,36 +1,93 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
       th:replace="~{fragments :: pagina('Usuarios', ~{::cuerpo})}">
 <body>
 <div th:fragment="cuerpo">
-    <h3>Usuarios</h3>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-    <form method="post" action="/usuarios/guardar" class="row g-2 mb-4">
-        <div class="col-md-3"><input name="nombre" class="form-control" placeholder="Nombre" required></div>
-        <div class="col-md-3"><input type="email" name="correo" class="form-control" placeholder="Correo" required></div>
-        <div class="col-md-2"><input type="password" name="password" class="form-control" placeholder="Clave" required></div>
-        <div class="col-md-2">
-            <select name="idRol" class="form-select">
-                <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}"></option>
-            </select>
-        </div>
-        <div class="col-md-2"><button class="btn btn-primary w-100">Agregar</button></div>
-    </form>
-    <table class="table table-striped bg-white">
-        <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
-        <tbody>
-        <tr th:each="u : ${lista}">
-            <td th:text="${u.nombre}"></td>
-            <td th:text="${u.correo}"></td>
-            <td th:text="${u.rol.nombreRol}"></td>
-            <td th:text="${u.activo} ? 'Activo' : 'Inactivo'"></td>
-            <td>
-                <a th:if="${u.activo}" th:href="@{/usuarios/desactivar/{id}(id=${u.idUsuario})}" class="btn btn-sm btn-warning">Desactivar</a>
-                <a th:unless="${u.activo}" th:href="@{/usuarios/activar/{id}(id=${u.idUsuario})}" class="btn btn-sm btn-success">Activar</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <h1 class="urbix-titulo">Usuarios</h1>
+    <p class="urbix-subtitulo">Personal con acceso al sistema y a la app de campo.</p>
+
+    <div th:if="${error}" class="urbix-alerta urbix-alerta-error" th:text="${error}"></div>
+
+    <div class="urbix-tarjeta">
+        <h3 th:if="${editando == null}">Registrar usuario</h3>
+        <h3 th:if="${editando != null}">Editar usuario</h3>
+
+        <form method="post" class="urbix-formulario"
+              th:action="${editando == null} ? @{/usuarios/guardar} : @{/usuarios/{id}/actualizar(id=${editando.idUsuario})}"
+              style="grid-template-columns: 1fr 1fr 1fr 1fr auto;">
+            <div>
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" required
+                       th:value="${editando != null} ? ${editando.nombre} : ''">
+            </div>
+            <div>
+                <label for="correo">Correo</label>
+                <input type="email" id="correo" name="correo" required
+                       th:value="${editando != null} ? ${editando.correo} : ''">
+            </div>
+            <div>
+                <label for="clave">Contraseña</label>
+                <input type="password" id="clave" name="clave"
+                       th:required="${editando == null}"
+                       th:pattern="${editando == null} ? '.{4,}' : null"
+                       th:placeholder="${editando != null} ? 'Dejar vacío para no cambiarla' : 'Mínimo 4 caracteres'">
+            </div>
+            <div>
+                <label for="idRol">Rol</label>
+                <select id="idRol" name="idRol" required>
+                    <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}"
+                            th:selected="${editando != null and editando.rol.idRol == r.idRol}"></option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="urbix-boton" th:text="${editando == null} ? 'Agregar' : 'Guardar'">Agregar</button>
+                <a th:if="${editando != null}" class="urbix-boton urbix-boton-secundario"
+                   th:href="@{/usuarios}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="urbix-tarjeta">
+        <h3>Usuarios registrados</h3>
+        <table class="urbix-tabla">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th style="width: 220px;">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${lista}">
+                <td th:text="${u.nombre}"></td>
+                <td th:text="${u.correo}"></td>
+                <td th:text="${u.rol.nombreRol}"></td>
+                <td>
+                    <span class="urbix-etiqueta"
+                          th:classappend="${u.activo} ? 'urbix-etiqueta-proceso' : 'urbix-etiqueta-reportada'"
+                          th:text="${u.activo} ? 'Activo' : 'Inactivo'"></span>
+                </td>
+                <td>
+                    <span class="urbix-acciones">
+                        <a class="urbix-mini" th:href="@{/usuarios/{id}/editar(id=${u.idUsuario})}">Editar</a>
+                        <form method="post" th:if="${u.activo}"
+                              th:action="@{/usuarios/{id}/estado(id=${u.idUsuario})}">
+                            <input type="hidden" name="activo" value="false">
+                            <button class="urbix-mini">Desactivar</button>
+                        </form>
+                        <form method="post" th:unless="${u.activo}"
+                              th:action="@{/usuarios/{id}/estado(id=${u.idUsuario})}">
+                            <input type="hidden" name="activo" value="true">
+                            <button class="urbix-mini">Activar</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

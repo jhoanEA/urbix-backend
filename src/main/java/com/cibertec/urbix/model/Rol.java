@@ -11,12 +11,18 @@ import jakarta.persistence.Table;
 @Table(name = "roles")
 public class Rol {
 
+    public static final String ADMINISTRADOR = "Supervisor / Admin";
+    public static final String INSPECTOR = "Inspector de Campo";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRol;
 
     @Column(name = "nombre_rol", nullable = false, unique = true, length = 50)
     private String nombreRol;
+
+    @Column(nullable = false)
+    private Boolean activo = true;
 
     public Integer getIdRol() {
         return idRol;
@@ -32,5 +38,13 @@ public class Rol {
 
     public void setNombreRol(String nombreRol) {
         this.nombreRol = nombreRol;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }
