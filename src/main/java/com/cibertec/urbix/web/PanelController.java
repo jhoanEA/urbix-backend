@@ -16,7 +16,7 @@ public class PanelController {
         this.panel = panel;
     }
 
-    @GetMapping({"/", "/panel"})
+    @GetMapping("/panel")
     public String panel(Model modelo) {
         modelo.addAttribute("total", panel.total());
         modelo.addAttribute("reportadas", panel.contar("Reportada"));

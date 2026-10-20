@@ -19,7 +19,12 @@ public class WebAuthController {
         this.autenticacion = autenticacion;
     }
 
-    @GetMapping({"/", "/login"})
+    @GetMapping("/")
+    public String inicio(HttpSession sesion) {
+        return SesionPortal.haySesion(sesion) ? "redirect:/panel" : "redirect:/login";
+    }
+
+    @GetMapping("/login")
     public String login() {
         return "login";
     }

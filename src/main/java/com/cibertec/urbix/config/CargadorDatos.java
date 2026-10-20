@@ -9,6 +9,7 @@ import com.cibertec.urbix.repository.RolRepository;
 import com.cibertec.urbix.repository.UsuarioRepository;
 import com.cibertec.urbix.repository.ZonaRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,7 +74,9 @@ public class CargadorDatos implements CommandLineRunner {
     }
 
     private void guardarRol(String nombre) {
-        if (roles.existsByNombreRol(nombre)) {
+        Optional<Rol> existente = roles.findByNombreRol(nombre);
+        if (existente.isPresent()) {
+            activar(existente.get(), Rol::getActivo, Rol::setActivo, roles);
             return;
         }
         Rol rol = new Rol();
@@ -83,7 +86,9 @@ public class CargadorDatos implements CommandLineRunner {
     }
 
     private void guardarCategoria(String nombre) {
-        if (categorias.existsByNombreCategoria(nombre)) {
+        Optional<Categoria> existente = categorias.findByNombreCategoria(nombre);
+        if (existente.isPresent()) {
+            activar(existente.get(), Categoria::getActivo, Categoria::setActivo, categorias);
             return;
         }
         Categoria categoria = new Categoria();
@@ -93,7 +98,9 @@ public class CargadorDatos implements CommandLineRunner {
     }
 
     private void guardarZona(String distrito, String sector) {
-        if (zonas.existsByNombreSector(sector)) {
+        Optional<Zona> existente = zonas.findByNombreSector(sector);
+        if (existente.isPresent()) {
+            activar(existente.get(), Zona::getActivo, Zona::setActivo, zonas);
             return;
         }
         Zona zona = new Zona();
@@ -101,6 +108,15 @@ public class CargadorDatos implements CommandLineRunner {
         zona.setNombreSector(sector);
         zona.setActivo(true);
         zonas.save(zona);
+    }
+
+    private <T> void activar(T elemento, java.util.function.Function<T, Boolean> lector,
+            java.util.function.BiConsumer<T, Boolean> escritor,
+            org.springframework.data.jpa.repository.JpaRepository<T, Integer> repositorio) {
+        if (!Boolean.TRUE.equals(lector.apply(elemento))) {
+            escritor.accept(elemento, true);
+            repositorio.save(elemento);
+        }
     }
 
     private void guardarUsuario(String nombre, String correo, String clavePlana, String rolNombre) {
